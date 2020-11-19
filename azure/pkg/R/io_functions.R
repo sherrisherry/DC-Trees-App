@@ -78,7 +78,11 @@ gfi_cty <- function(opt, logf, max_try = 10){
 }
 
 deco_path_stor <- function(path){
-  
+  vct <- strsplit(path, '/')[[1]]
+  path <- list()
+  path$acct <- vct[1]; path$cont <- vct[2]
+  path$dir <- ifelse(length(vct)>2, paste(vct[-1:-2], sep = '/'), NULL)
+  return(path)
 }
 
 az_ep <- function(resrc, serv){
