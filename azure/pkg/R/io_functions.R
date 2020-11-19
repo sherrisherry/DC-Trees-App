@@ -27,24 +27,27 @@ nv_cols <- function(nm, cl, obj, io = TRUE){
 
 in_bridge <- function(nm, cl, logf, max_try = 10, io = TRUE){
   cols <- nv_cols(nm, cl, 'bridge', io)
+  pth <- deco_path_stor('dlake02/coding-systems/bridge.csv')
   batchscr::ecycle(bridge <- az_read_blob(FUN = function(x)read.csv(x, colClasses=cols, header=T, fileEncoding = 'UTF8'),
-                                                  object = 'bridge.csv', container = 'supplemental'),
+                                          object = pth$obj, container = az_container(pth)),
                    {if(!missing(logf))logf(paste('0000', '!', 'loading bridge.csv failed', sep = '\t')); return(NULL)}, max_try)
   return(bridge)
 }
 
 in_geo <- function(nm, cl, logf, max_try = 10, io = TRUE){
   cols <- nv_cols(nm, cl, 'geo', io)
-  batchscr::ecycle(geo <- aws.s3::s3read_using(FUN = function(x)read.csv(x, colClasses=cols, header=T, na.strings=''),
-                                               object = 'CEPII_GeoDist.csv', bucket = 'gfi-supplemental'),
+  pth <- deco_path_stor('cachetemp/supplemental/CEPII_GeoDist.csv')
+  batchscr::ecycle(geo <- az_read_blob(FUN = function(x)read.csv(x, colClasses=cols, header=T, na.strings=''),
+                                       object = pth$obj, container = az_container(pth)),
                    {if(!missing(logf))logf(paste('0000', '!', 'loading CEPII_GeoDist.csv failed', sep = '\t')); return(NULL)}, max_try)
   return(geo)
 }
 
 in_eia <- function(nm, cl, logf, max_try = 10, io = TRUE){
   cols <- nv_cols(nm, cl, 'eia', io)
+  pth <- deco_path_stor('cachetemp/supplemental/EIA.csv.bz2')
   tmp <- tempfile()
-  batchscr::ecycle(aws.s3::save_object(object = 'EIA.csv.bz2', bucket = 'gfi-supplemental', file = tmp, overwrite = TRUE),
+  batchscr::ecycle(AzureStor::storage_download(src = pth$obj, container = az_container(pth), dest = tmp, overwrite = TRUE),
                    {if(!missing(logf))logf(paste('0000', '!', 'retrieving EIA file failed', sep = '\t')); return(NULL)}, max_try)
   batchscr::ecycle(eia <- read.csv(bzfile(tmp), header=T, colClasses=cols, na.strings="", stringsAsFactors = F),
                    {if(!missing(logf))logf(paste('0000', '!', 'loading file failed', sep = '\t')); return(NULL)},
@@ -54,8 +57,9 @@ in_eia <- function(nm, cl, logf, max_try = 10, io = TRUE){
 
 in_hkrx <- function(yr, nm, cl, logf, max_try = 10, io = TRUE){
   cols <- nv_cols(nm, cl, 'hkrx', io)
+  pth <- deco_path_stor('cachetemp/supplemental')
   tmp <- tempfile()
-  batchscr::ecycle(aws.s3::save_object(object = paste('HK', yr, 'rx.csv.bz2', sep = '_'), bucket = 'gfi-supplemental', file = tmp, overwrite = TRUE),
+  batchscr::ecycle(AzureStor::storage_download(src = paste('HK', yr, 'rx.csv.bz2', sep = '_'), container = az_container(pth), dest = tmp, overwrite = TRUE),
                    {if(!missing(logf))logf(paste(yr, '!', 'retrieving hkrx file failed', sep = '\t')); return(NULL)}, max_try)
   batchscr::ecycle(hk <- read.csv(bzfile(tmp), header=T, colClasses=cols, na.strings="", stringsAsFactors = F),
                    {if(!missing(logf))logf(paste(yr, '!', 'loading hkrx file failed', sep = '\t')); return(NULL)},
@@ -81,7 +85,7 @@ deco_path_stor <- function(path){
   vct <- strsplit(path, '/')[[1]]
   path <- list()
   path$acct <- vct[1]; path$cont <- vct[2]
-  path$dir <- ifelse(length(vct)>2, paste(vct[-1:-2], sep = '/'), NULL)
+  path$obj <- ifelse(length(vct)>2, paste(vct[-1:-2], sep = '/'), NULL)
   return(path)
 }
 
