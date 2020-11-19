@@ -20,8 +20,8 @@ nv_cols <- function(nm, cl, obj, io = TRUE){
            names(cols) <- c("t","origin_hk","consig_hk","k","vrx_hkd","origin_un","consig_un","vrx_un")
          },
          chgold = {
-           cols_swiss <- c("character","integer","character","integer",rep("numeric",2))
-           names(cols_swiss) <- c('mx','j','k','t','v','q_kg')
+           cols <- c("character","integer","character","integer",rep("numeric",2))
+           names(cols) <- c('mx','j','k','t','v','q_kg')
          })
   if(missing(nm))nm <- names(cols)
   if(!missing(cl))cols[nm] <- cl
