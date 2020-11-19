@@ -103,7 +103,7 @@ az_container <- function(obj){
   return(AzureStor::storage_container(ep, obj$cont))
 }
 
-az_read_blob(FUN, object, container){
+az_read_blob <- function(FUN, object, container){
   tmp <- tempfile()
   AzureStor::storage_download(container, object, tmp)
   blob <- FUN(tmp)
@@ -111,7 +111,7 @@ az_read_blob(FUN, object, container){
   return(blob)
 }
 
-az_write_blob(obj, FUN, object, container){
+az_write_blob <- function(obj, FUN, object, container){
   tmp <- tempfile()
   FUN(obj, tmp)
   AzureStor::storage_upload(container, tmp, object)
