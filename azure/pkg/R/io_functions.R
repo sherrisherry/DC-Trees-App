@@ -27,8 +27,8 @@ nv_cols <- function(nm, cl, obj, io = TRUE){
 
 in_bridge <- function(nm, cl, logf, max_try = 10, io = TRUE){
   cols <- nv_cols(nm, cl, 'bridge', io)
-  batchscr::ecycle(bridge <- aws.s3::s3read_using(FUN = function(x)read.csv(x, colClasses=cols, header=T, fileEncoding = 'UTF8'),
-                                                  object = 'bridge.csv', bucket = 'gfi-supplemental'),
+  batchscr::ecycle(bridge <- az_read_blob(FUN = function(x)read.csv(x, colClasses=cols, header=T, fileEncoding = 'UTF8'),
+                                                  object = 'bridge.csv', container = 'supplemental'),
                    {if(!missing(logf))logf(paste('0000', '!', 'loading bridge.csv failed', sep = '\t')); return(NULL)}, max_try)
   return(bridge)
 }
@@ -96,4 +96,23 @@ az_ep <- function(resrc, serv){
 
 az_key <- function(resrc, serv){
   return(keycache$key[keycache$name==resrc & keycache$service==serv])
+}
+
+az_container <- function(obj){
+  ep <- AzureStor::storage_endpoint(az_ep(obj$acct, 'blob'), key = az_key(obj$acct, 'storage'))
+  return(AzureStor::storage_container(ep, obj$cont))
+}
+
+az_read_blob(FUN, object, container){
+  tmp <- tempfile()
+  AzureStor::storage_download(container, object, tmp)
+  blob <- FUN(tmp)
+  unlink(tmp)
+  return(blob)
+}
+
+az_write_blob(obj, FUN, object, container){
+  tmp <- tempfile()
+  FUN(obj, tmp)
+  AzureStor::storage_upload(container, tmp, object)
 }
