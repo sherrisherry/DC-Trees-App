@@ -18,6 +18,10 @@ nv_cols <- function(nm, cl, obj, io = TRUE){
          hkrx = {
            cols <- c(rep("integer",3),"character","numeric",rep("integer",2),"numeric")
            names(cols) <- c("t","origin_hk","consig_hk","k","vrx_hkd","origin_un","consig_un","vrx_un")
+         },
+         chgold = {
+           cols_swiss <- c("character","integer","character","integer",rep("numeric",2))
+           names(cols_swiss) <- c('mx','j','k','t','v','q_kg')
          })
   if(missing(nm))nm <- names(cols)
   if(!missing(cl))cols[nm] <- cl
@@ -40,6 +44,15 @@ in_geo <- function(nm, cl, logf, max_try = 10, io = TRUE){
   batchscr::ecycle(geo <- az_read_blob(FUN = function(x)read.csv(x, colClasses=cols, header=T, na.strings=''),
                                        object = pth$obj, container = az_container(pth)),
                    {if(!missing(logf))logf(paste('0000', '!', 'loading CEPII_GeoDist.csv failed', sep = '\t')); return(NULL)}, max_try)
+  return(geo)
+}
+
+in_swissgold <- function(nm, cl, logf, max_try = 10, io = TRUE){
+  cols <- nv_cols(nm, cl, 'chgold', io)
+  pth <- deco_path_stor('cachetemp/supplemental/Swiss_mx_71-72.csv')
+  batchscr::ecycle(geo <- az_read_blob(FUN = function(x)read.csv(x, colClasses=cols, header=T, na.strings=''),
+                                       object = pth$obj, container = az_container(pth)),
+                   {if(!missing(logf))logf(paste('0000', '!', 'loading Swiss_mx_71-72.csv failed', sep = '\t')); return(NULL)}, max_try)
   return(geo)
 }
 
