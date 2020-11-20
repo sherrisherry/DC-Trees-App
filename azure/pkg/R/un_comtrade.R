@@ -33,7 +33,8 @@ unct_hk <- function(unct, hk, yr, mx, logf, max_try = 10, out_container, tag = '
   ij <- switch(mx, M = c('j', 'i'), X = c('i', 'j'))
   cols_hk <- c(ij,"k","v_rx_hk")
   names(cols_hk) <- c("origin_un","consig_un","k","vrx_un")
-  cols_out <- c("hs_rpt","hs_ptn",ij,"k","v_X","v_M","v_rM","v_rX","q_X","q_M","q_kg_X","q_kg_M","q_code_X","q_code_M")
+  # cols_out <- c("hs_rpt","hs_ptn",ij,"k","v_X","v_M","v_rM","v_rX","q_X","q_M","q_kg_X","q_kg_M","q_code_X","q_code_M")
+  cols_out <- c("hs_rpt","hs_ptn",ij,"k","v_X","v_M","q_X","q_M","q_kg_X","q_kg_M","q_code_X","q_code_M")
   if(!setequal(names(cols_hk), colnames(hk)) || !all(cols_out %in% colnames(unct))){
     if(!missing(logf))logf(paste(yr, '!', 'HK adj col mismatch', sep = '\t'))
     return(NULL)
