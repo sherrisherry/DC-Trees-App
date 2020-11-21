@@ -118,7 +118,6 @@ unct_treat <- function(unct,t_in) {
   # (2) Beginning in 2006, adjust Slovakia[703] reports to reflect Montenegro[499] independently from Serbia-Montegro[891]
   if (t_in >= 2006) {
     # unpack unct
-    colnames_out <- colnames(unct)
     s_891  <-  subset(unct, unct$i==703 & unct$j==891)  # isolate portion of data for which Slovakia reports trade flows with Serbia-Montenegro
     n_891  <- dim(s_891)[1]
     if (n_891 > 0) {
