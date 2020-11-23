@@ -128,8 +128,8 @@ az_read_blob <- function(FUN, object, container){
   return(blob)
 }
 
-az_write_blob <- function(obj, FUN, object, container){
+az_write_blob <- function(obj, FUN, object, container, overwrite = T){
   tmp <- tempfile()
   FUN(obj, tmp)
-  AzureStor::storage_upload(container, tmp, object)
+  AzureStor::storage_upload(container = container, src = tmp, dest = object, overwrite = overwrite)
 }
