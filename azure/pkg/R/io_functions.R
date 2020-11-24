@@ -97,6 +97,8 @@ gfi_cty <- function(opt, logf, max_try = 10){
 deco_path_stor <- function(path){
   vct <- strsplit(path, '/')[[1]]
   path <- list()
+  if(grepl('.+:.+', vct[1])){path$type = strsplit(vct[1], ':')[[1]][1]; vct[1] = strsplit(vct[1], ':')[[1]][2]}
+  else path$type = 'blob'
   path$acct <- vct[1]; path$cont <- vct[2]
   path$obj <- ifelse(length(vct)>2, paste(vct[-1:-2], sep = '/'), '')
   return(path)
@@ -115,8 +117,8 @@ az_key <- function(resrc, serv){
   return(keycache$key[keycache$name==resrc & keycache$service==serv])
 }
 
-az_container <- function(obj, type = 'blob'){
-  ep <- AzureStor::storage_endpoint(az_ep(obj$acct, type), key = az_key(obj$acct, 'storage'))
+az_container <- function(obj){
+  ep <- AzureStor::storage_endpoint(az_ep(obj$acct, obj$type), key = az_key(obj$acct, 'storage'))
   return(AzureStor::storage_container(ep, obj$cont))
 }
 
