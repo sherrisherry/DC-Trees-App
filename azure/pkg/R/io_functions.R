@@ -115,8 +115,8 @@ az_key <- function(resrc, serv){
   return(keycache$key[keycache$name==resrc & keycache$service==serv])
 }
 
-az_container <- function(obj){
-  ep <- AzureStor::storage_endpoint(az_ep(obj$acct, 'blob'), key = az_key(obj$acct, 'storage'))
+az_container <- function(obj, type = 'blob'){
+  ep <- AzureStor::storage_endpoint(az_ep(obj$acct, type), key = az_key(obj$acct, 'storage'))
   return(AzureStor::storage_container(ep, obj$cont))
 }
 
